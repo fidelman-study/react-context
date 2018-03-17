@@ -1,19 +1,63 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+
+// new context
+const MyContext = React.createContext();
+
+// provider
+class MyProvider extends Component {
+  state = {
+    age: 100
+  }
+
+  growYearOlder = () => {
+    this.setState(prevState => ({ age: prevState.age + 1 }));
+  }
+
+  render() {
+    return(
+      <MyContext.Provider value={{
+        state: this.state,
+        growYearOlder: this.growYearOlder
+      }}>
+        {this.props.children}
+      </MyContext.Provider>
+    );
+  }
+}
+
+
+const Family = (props) => (
+  <div className="family">
+    <Person />
+  </div>
+);
+
+class Person extends Component {
+  render() {
+    return (
+      <div className="person">
+        <MyContext.Consumer>
+          {(context) => (
+            <React.Fragment>
+              <p>I'm {context.state.age}</p>
+              <button type="button" onClick={context.growYearOlder}>Grow</button>
+            </React.Fragment>
+          )}
+        </MyContext.Consumer>
+      </div>
+    );
+  }
+}
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
+      <MyProvider>
+        <div>
+          <p>I'm the app</p>
+          <Family />
+        </div>
+      </MyProvider>
     );
   }
 }
